@@ -1,0 +1,35 @@
+stages:
+  - Build
+  - Deploy
+
+"Server code":
+  tags:
+    - build-vm-shell
+  stage: Build
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^([0-9]+)\.([0-9]+)b?$/'
+  script:
+    - echo "$CI_COMMIT_TAG"
+    - echo "$CI_COMMIT_BRANCH"
+    - chmod +x ./generate-php8-server.sh
+    - ./generate-php8-server.sh "$CI_COMMIT_TAG"
+  artifacts:
+    name: sprut-server-api-$CI_COMMIT_TAG
+    paths:
+      - ./artifacts/*
+    expire_in: 31 day
+
+"Client code":
+  tags:
+    - build-vm-shell
+  stage: Build
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^([0-9]+)\.([0-9]+)b?$/'
+  script:
+    - chmod +x ./generate-php7-client.sh
+    - ./generate-php7-client.sh "$CI_COMMIT_TAG"
+  artifacts:
+    name: sprut-client-api-$CI_COMMIT_TAG
+    paths:
+      - ./artifacts/*
+    expire_in: 31 day

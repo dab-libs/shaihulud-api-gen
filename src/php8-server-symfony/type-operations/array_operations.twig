@@ -1,0 +1,125 @@
+{{ writeFile(typeOperationFolder ~ 'ArrayOperations.php') }}
+<?php declare(strict_types=1);
+
+namespace {{ typeOperationNamespace }};
+
+use Exception;
+
+class ArrayOperations {
+  public static function createFromDecoded(?array $decoded, callable $createItem): ?array {
+    if ($decoded === null) {
+      return null;
+    }
+    $array = [];
+    foreach ($decoded as $item) {
+      $array[] = $createItem($item);
+    }
+    return $array;
+  }
+
+  public static function prepareToEncode(?array $value, callable $prepareItem): ?array {
+    if ($value === null) {
+      return null;
+    }
+    $array = [];
+    foreach ($value as $item) {
+      $array[] = $prepareItem($item);
+    }
+    return $array;
+  }
+
+  public static function decodeJson(?string $value): mixed {
+    if ($value === null) {
+      return null;
+    }
+    return json_decode($value);
+  }
+
+  public static function encodeJson(?array $value, callable $prepareItem): ?string {
+    if ($value === null) {
+      return null;
+    }
+    return json_encode(self::prepareToEncode($value, $prepareItem));
+  }
+
+  public static function decodeSimple(?array $value): ?array {
+    if ($value === null) {
+      return null;
+    }
+    $decoded = [];
+    foreach ($value as $item) {
+      $jsonDecoded = json_decode($item);
+      if ($jsonDecoded === null) {
+        $decoded[] = $item;
+      }
+      else {
+        $decoded[] = $jsonDecoded;
+      }
+    }
+    return $decoded;
+  }
+
+  public static function encodeSimple(?array $value): ?array {
+    if ($value === null) {
+      return null;
+    }
+    $encoded = [];
+    foreach ($value as $item) {
+      if (is_string($item)) {
+        $encoded[] = $item;
+      }
+      else {
+        $encoded[] = json_encode($item);
+      }
+    }
+    return $encoded;
+  }
+
+  /** @throws Exception */
+  public static function validate(?array $decoded, string $name, bool $required, int $minItems, ?int $maxItems, callable $validateItem) {
+    if ($decoded === null) {
+      if ($required === true) {
+        throw new Exception($name . ' is not found');
+      }
+      return;
+    }
+
+    if (!is_array($decoded)) {
+      throw new Exception($name . ' is not a array');
+    }
+
+    self::validateMinItems($decoded, $name, $minItems);
+    self::validateMaxItems($decoded, $name, $maxItems);
+    self::validateItems($decoded, $name, $validateItem);
+  }
+
+  public static function createForTest($createItemForTest): array {
+    return [$createItemForTest(), $createItemForTest()];
+  }
+
+  /** @throws Exception */
+  private static function validateMinItems(array $value, string $name, int $minItems) {
+    if (count($value) < $minItems) {
+      throw new Exception($name . ' is too short. Its length is littler then ' . $minItems);
+    }
+  }
+
+  /** @throws Exception */
+  private static function validateMaxItems(array $value, string $name, ?int $maxItems) {
+    if ($maxItems !== null && count($value) > $maxItems) {
+      throw new Exception($name . ' is too long. Its length is greater then ' . $maxItems);
+    }
+  }
+
+  /** @throws Exception */
+  private static function validateItems(array $value, string $name, callable $validateItem) {
+    try {
+      foreach ($value as $i => $item) {
+        $validateItem($item, (string) $i);
+      }
+    }
+    catch (Exception $e) {
+      throw new Exception($name . '\'s item is not valid. ' . $e->getMessage(), 0, $e);
+    }
+  }
+}
