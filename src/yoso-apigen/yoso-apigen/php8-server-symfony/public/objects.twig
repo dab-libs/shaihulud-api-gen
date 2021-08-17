@@ -1,0 +1,29 @@
+{% for object in objects %}
+{{ writeFile(publicFolder ~ object.type ~ '.php') }}
+<?php declare(strict_types=1);
+
+namespace {{ publicNamespace }};
+
+{%   for type in object.importedTypes %}
+use {{ type }};
+{%   endfor %}
+
+/*
+ * {{ object.description }}
+
+ */
+class {{ object.type }} {
+  /**
+{%   for property in object.properties %}
+    * @param {{ property.typeInfo.type }}{{ property.nullableDoc }} ${{ property.name }} {{ property.description }}
+
+{%   endfor %}
+    */
+  public function __construct(
+{%   for property in object.properties %}
+    public {{ property.nullable }}{{ property.typeInfo.type }} ${{ property.name }},
+{%   endfor %}
+  ) {
+  }
+}
+{% endfor %}
