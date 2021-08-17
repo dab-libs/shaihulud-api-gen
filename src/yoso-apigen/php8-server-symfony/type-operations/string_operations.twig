@@ -1,0 +1,81 @@
+{{ writeFile(typeOperationFolder ~ 'StringOperations.php') }}
+<?php declare(strict_types=1);
+
+namespace {{ typeOperationNamespace }};
+
+use Exception;
+
+class StringOperations {
+  public static function createFromDecoded(?string $decoded): ?string {
+    return $decoded;
+  }
+
+  public static function prepareToEncode(?string $value): ?string {
+    return $value;
+  }
+
+  public static function decodeJson(?string $value): mixed {
+    if ($value === null) {
+      return null;
+    }
+    return json_decode($value);
+  }
+
+  public static function encodeJson(?string $value): ?string {
+    if ($value === null) {
+      return null;
+    }
+    return json_encode($value);
+  }
+
+  public static function decodeSimple(?string $value): ?string {
+    if ($value === null) {
+      return null;
+    }
+    return $value;
+  }
+
+  public static function encodeSimple(?string $value): ?string {
+    if ($value === null) {
+      return null;
+    }
+    return $value;
+  }
+
+  /** @throws Exception */
+  public static function validate(mixed $decoded, string $name, bool $required, int $minLength, ?int $maxLength): void {
+    if ($decoded === null) {
+      if ($required) {
+        throw new Exception($name . ' is not found');
+      }
+      return;
+    }
+    if (!is_string($decoded)) {
+      throw new Exception($name . ' is not a string');
+    }
+    if (null !== $maxLength) {
+      self::validateMaxLength($decoded, $name, $maxLength);
+    }
+    if (null !== $minLength) {
+      self::validateMinLength($decoded, $name, $minLength);
+    }
+  }
+
+  /** @throws Exception */
+  private static function validateMaxLength(string $value, string $name, int $maxLength): void {
+    if ($maxLength !== null && strlen($value) > $maxLength) {
+      throw new Exception($name . ' is too long. Its length is greater then ' . $maxLength);
+    }
+  }
+
+/** @throws Exception */
+  private static function validateMinLength(string $value, string $name, int $minLength) {
+    if ($minLength !== null && strlen($value) < $minLength) {
+      throw new Exception($name . ' is too short. Its length is littler then ' . $minLength);
+    }
+  }
+
+  public static function createForTest(): string {
+    return 'string';
+  }
+}
