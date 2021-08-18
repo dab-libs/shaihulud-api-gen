@@ -8,10 +8,10 @@ stages:
   rules:
     - if: '$CI_COMMIT_TAG =~ /^([0-9]+)\.([0-9]+)(-dev)?$/'
   script:
-    - rm -rdf yoso-apigen
-    - cp -r src yoso-apigen
+    - chmod +x build.sh
+    - build.sh "$CI_COMMIT_TAG"
   artifacts:
     name: yoso-apigen-$CI_COMMIT_TAG
     paths:
-      - ./yoso-apigen/*
+      - ./yoso-apigen.jar
     expire_in: 31 day
