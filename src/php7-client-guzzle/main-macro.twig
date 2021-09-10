@@ -91,7 +91,7 @@
 {% endmacro %}
 
 {% macro dateTimeOptions(required, schema) %}
-required: {{ literal(required) }}
+{{ literal(required) }}
 {% endmacro %}
 
 {% macro typeOptions(name, required, schema, allSchemas) %}
