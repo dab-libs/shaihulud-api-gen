@@ -15,8 +15,13 @@ use {{ type }};
 class {{ object.type }} {
   /**
 {%   for property in object.properties %}
+{%     if property.typeInfo.type != 'array' %}
     * @param {{ property.typeInfo.type }}{{ property.nullableDoc }} ${{ property.name }} {{ property.description }}
 
+{%     else %}
+    * @param {{ property.typeInfo.arrayItem.type }}[]{{ property.nullableDoc }} ${{ property.name }} {{ property.description }}
+
+{%     endif %}
 {%   endfor %}
     */
   public function __construct(

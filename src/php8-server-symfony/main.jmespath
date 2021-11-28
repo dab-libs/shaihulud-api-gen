@@ -1,5 +1,6 @@
 expression(
     'schemaToType',
+    {"$ref": '', type: '', format: ''},
     &
     replace_all(@."$ref", '#/components/schemas/(\\w+)', '\\\\u$1') ||
     type == 'string' && format == 'date-time' && 'DateTimeImmutable' ||
@@ -13,6 +14,7 @@ expression(
 ).
 expression(
     'schemaToTypeDoc',
+    {"$ref": '', type: '', items: []},
     &
     replace_all(@."$ref", '#/components/schemas/(\\w+)', '\\\\u$1') ||
     type == 'string' && 'string' ||
@@ -25,13 +27,94 @@ expression(
 ).
 expression(
     'schemaToOperationsType',
+    {"$ref": '', type: '', format: '', items: []},
     &
     apply('schemaToType', @) && concat( pascal_case( apply('schemaToType', @)), 'Operations') ||
     null,
     @
 ).
 expression(
+    'schemaToObjectOptions',
+    {required: true, schema: {type: ''}},
+    &
+    concat(
+      'required: ', required
+    ),
+    @
+).
+expression(
+    'schemaToDateTimeImmutable',
+    {required: true, schema: {type: ''}},
+    &
+    concat(
+      'required: ', required
+    ),
+    @
+).
+expression(
+    'schemaToString',
+    {required: true, schema: {type: ''}},
+    &
+    concat(
+      'required: ', required,
+      ', minLength: ', schema.minLength,
+      ', maxLength: ', schema.maxLength
+    ),
+    @
+).
+expression(
+    'schemaToNumber',
+    {required: true, schema: {type: ''}},
+    &
+    concat(
+      'required: ', required,
+      ', maximum: ', schema.maximum,
+      ', exclusiveMaximum: ', schema.exclusiveMaximum,
+      ', minimum: ', schema.minimum,
+      ', exclusiveMinimum: ', schema.exclusiveMinimum,
+      ', multipleOf: ', schema.multipleOf
+    ),
+    @
+).
+expression(
+    'schemaToBool',
+    {required: true, schema: {type: ''}},
+    &
+    concat(
+      'required: ', required
+    ),
+    @
+).
+expression(
+    'schemaToArray',
+    {required: true, schema: {type: ''}},
+    &
+    concat(
+      'required: ', required,
+      ', minItems: ', schema.minItems,
+      ', maxItems: ', schema.maxItems,
+      ', validateItem: fn(mixed $decoded, string $name) => ', apply('schemaToOperationsType', schema.items),
+      '::validate(decoded: $decoded, name: $name, ', apply('schemaToTypeOptions', {required: true, schema: schema.items})
+    ),
+    @
+).
+expression(
+    'schemaToTypeOptions',
+    {required: true, schema: {type: ''}},
+    &
+    contains(keys(schema), '$ref') && apply('schemaToObjectOptions', @) ||
+    type == 'string' && format == 'date-time' && apply('schemaToDateTimeImmutable', @) ||
+    type == 'string' && apply('schemaToString', @) ||
+    type == 'integer' && apply('schemaToNumber', @) ||
+    type == 'number' && apply('schemaToNumber', @) ||
+    type == 'boolean' && apply('schemaToBool', @) ||
+    type == 'array' && apply('schemaToArray', @) ||
+    null,
+    @
+).
+expression(
     'schemaIsPrimitive',
+    {type: ''},
     &
     type == 'string' ||
     type == 'integer' ||
@@ -41,16 +124,17 @@ expression(
 ).
 expression(
     'createTypeInfo',
+    {name: '', scheme: '', parent: ''},
     &
     {
         primitive: apply('schemaIsPrimitive', schema),
         type: apply('schemaToType', schema) ||
-              halt(concat('Can be generated code for "', name, '" in "', parent, '"')),
+              halt(concat('Can not be generated code for "', name, '" in "', parent, '"')),
         operationsType: apply('schemaToOperationsType', schema),
         arrayItem: schema.type == 'array' && apply('createTypeInfo', {
             schema: schema.items,
             name: concat(name, '.item'),
-            parent: parent
+            parent: concat(name, '.', parent)
         })
     },
     @
@@ -127,6 +211,7 @@ merge(@, {
                     name: name,
                     parent: get_var('controllerType')
                 }),
+                typeOptions: apply('schemaToTypeOptions', {required: required, schema: schema}),
                 bagName: property({path: 'attributes', query: 'query', header: 'headers', cookie: 'cookies'}, in),
                 bagMethod: if(schema.type == 'array', @, &'all', &'get')
             }),

@@ -21,12 +21,11 @@ use {{ typeOperationNamespace }}\{{ controller.body.typeInfo.operationsType }};
 {%     endif %}
 
 class {{ controller.controllerType }} {
-  private ?{{ controller.actionType }} $action;
-  private EntityManagerInterface $entityManager;
-
-  public function __construct(?{{ controller.actionType }} $action, EntityManagerInterface $entityManager) {
-    $this->action = $action;
-    $this->entityManager = $entityManager;
+  public function __construct(
+    private ?{{ controller.actionType }} $action;
+    private EntityManagerInterface $entityManager;
+    private LoggerInterface $logger;
+  ) {
   }
 
   /**
@@ -66,9 +65,13 @@ class {{ controller.controllerType }} {
       $this->entityManager->flush();
       $this->entityManager->commit();
     }
-    catch (Exception $exception) {
+    catch (Exception $e) {
+      $this->logger->error(
+        sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e::class, $e->getMessage(), $e->getFile(), $e->getLine()),
+        ['exception' => $e]
+      );
       $this->entityManager->rollBack();
-      $result = $this->action->createExceptedResult($exception);
+      $result = $this->action->createExceptedResult($e);
     }
 
     ob_clean();
