@@ -8,6 +8,7 @@ namespace {{ controllerNamespace }};
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use {{ publicNamespace }}\{{ controller.actionType }};
 {%     for result in controller.results %}
@@ -82,7 +83,7 @@ class {{ controller.controllerType }} {
       $headers = [
         'Content-Type' => 'application/json',
 {%         for header in result.headers %}
-        '{{ header.name }}' => json_encode($result->headers->{{ header.fieldName }}),
+        '{{ header.name }}' => json_encode($result->headers->{{ header.fieldName }}, JSON_UNESCAPED_UNICODE),
 {%         endfor %}
       ];
       return new Response(
@@ -100,7 +101,7 @@ class {{ controller.controllerType }} {
       $headers = [
         'Content-Type' => 'application/json',
 {%         for header in result.headers %}
-        '{{ header.name }}' => json_encode($result->headers->{{ header.fieldName }}),
+        '{{ header.name }}' => json_encode($result->headers->{{ header.fieldName }}, JSON_UNESCAPED_UNICODE),
 {%         endfor %}
       ];
       return new Response(

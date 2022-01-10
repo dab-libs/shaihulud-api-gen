@@ -49,7 +49,7 @@ class {{ type }}Operations {
     if ($value === null) {
       return null;
     }
-    return json_encode(self::prepareToEncode($value));
+    return json_encode(self::prepareToEncode($value), JSON_UNESCAPED_UNICODE);
   }
 
   public static function decodeSimple(?array $value): ?object {
@@ -72,7 +72,7 @@ class {{ type }}Operations {
 {%     set propertyName = propertyEntry.key %}
 {%     set propertySchema = propertyEntry.value %}
 {%     set required = objectSchema.required contains propertyName %}
-    $encoded['{{ propertyName }}'] = json_encode({{ operationsType(propertySchema, propertyName, type) }}::prepareToEncode($value->{{ propertyName }}{{ arrayItemPreparer(propertySchema) }}));
+    $encoded['{{ propertyName }}'] = json_encode({{ operationsType(propertySchema, propertyName, type) }}::prepareToEncode($value->{{ propertyName }}{{ arrayItemPreparer(propertySchema) }}), JSON_UNESCAPED_UNICODE);
 {%   endfor %}
     return $encoded;
   }

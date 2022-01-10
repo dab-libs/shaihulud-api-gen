@@ -25,7 +25,7 @@ class StringOperations {
     if ($value === null) {
       return null;
     }
-    return json_encode($value);
+    return json_encode($value, JSON_UNESCAPED_UNICODE);
   }
 
   public static function decodeSimple(?string $value): ?string {

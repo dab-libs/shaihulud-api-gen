@@ -39,7 +39,7 @@ class ArrayOperations {
     if ($value === null) {
       return null;
     }
-    return json_encode(self::prepareToEncode($value, $prepareItem));
+    return json_encode(self::prepareToEncode($value, $prepareItem), JSON_UNESCAPED_UNICODE);
   }
 
   public static function decodeSimple(?array $value): ?array {
@@ -69,7 +69,7 @@ class ArrayOperations {
         $encoded[] = $item;
       }
       else {
-        $encoded[] = json_encode($item);
+        $encoded[] = json_encode($item, JSON_UNESCAPED_UNICODE);
       }
     }
     return $encoded;
