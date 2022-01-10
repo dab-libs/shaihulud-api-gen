@@ -23,9 +23,9 @@ use {{ typeOperationNamespace }}\{{ controller.body.typeInfo.operationsType }};
 
 class {{ controller.controllerType }} {
   public function __construct(
-    private ?{{ controller.actionType }} $action;
-    private EntityManagerInterface $entityManager;
-    private LoggerInterface $logger;
+    private ?{{ controller.actionType }} $action,
+    private EntityManagerInterface $entityManager,
+    private LoggerInterface $logger,
   ) {
   }
 
