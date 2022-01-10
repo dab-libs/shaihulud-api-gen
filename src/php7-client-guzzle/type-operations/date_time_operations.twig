@@ -32,7 +32,7 @@ class DateTimeImmutableOperations {
     if ($value === null) {
       return null;
     }
-    return json_encode(self::prepareToEncode($value));
+    return json_encode(self::prepareToEncode($value), JSON_UNESCAPED_UNICODE);
   }
 
   public static function decodeSimple(?string $value): mixed {
