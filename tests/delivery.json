@@ -1,0 +1,356 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "4.0.0",
+    "title": "Sprut Delivery Api",
+    "contact": {
+      "name": "yoso",
+      "email": "team@yoso.ru"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://sprut.localhost:9333/"
+    }
+  ],
+  "security": [
+    {
+      "SprutAuth": []
+    }
+  ],
+  "paths": {
+    "/v4/delivery/intervals/company/{companyId}/next/{days}": {
+      "get": {
+        "summary": "Возвращает список доступных интервалов доставки на следующие {days} рабочих дней",
+        "operationId": "getDeliveryIntervalsForNextDays",
+        "parameters": [
+          {
+            "name": "companyId",
+            "description": "идентификатор компании",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "days",
+            "description": "количество рабочих дней",
+            "in": "path",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NwkDeliveryInterval"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NwkError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v4/delivery/intervals/list/company/{companyId}/next/{days}": {
+      "get": {
+        "summary": "Возвращает список доступных интервалов доставки на следующие {days} рабочих дней, в т.ч. выключенные, с их статусом",
+        "operationId": "listAllInvervalsForNextDays",
+        "parameters": [
+          {
+            "name": "companyId",
+            "description": "идентификатор компании",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "days",
+            "description": "количество рабочих дней",
+            "in": "path",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NwkDeliveryIntervalWithState"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NwkError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v4/delivery/intervals/enable/company/{companyId}": {
+      "post": {
+        "summary": "Включает интервал доставки",
+        "operationId": "enableInterval",
+        "parameters": [
+          {
+            "name": "companyId",
+            "description": "идентификатор компании",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/NwkDeliveryInterval"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                      "success"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NwkError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v4/delivery/intervals/disable/company/{companyId}": {
+      "post": {
+        "summary": "Включает интервал доставки",
+        "operationId": "disableInterval",
+        "parameters": [
+          {
+            "name": "companyId",
+            "description": "идентификатор компании",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/NwkDeliveryInterval"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                      "success"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NwkError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v4/delivery/intervals/import": {
+      "get": {
+        "summary": "Импортирует интервалы доставки",
+        "operationId": "import",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NwkImportResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NwkError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "SprutAuth": {
+        "type": "apiKey",
+        "name": "X-SPRUT-TOKEN",
+        "in": "header"
+      }
+    },
+    "schemas": {
+      "NwkImportResponse": {
+        "type": "object",
+        "required": [
+            "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        }
+      },
+      "NwkDeliveryInterval": {
+        "type": "object",
+        "description": "Интервал доставки",
+        "required": [
+            "from",
+            "to"
+        ],
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Начало интервала доставки"
+          },
+          "to": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Окончание интервала доставки"
+          }
+        }
+      },
+      "NwkDeliveryIntervalWithState": {
+        "type": "object",
+        "description": "Интервал доставки",
+        "required": [
+            "from",
+            "to",
+            "enabled"
+        ],
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Начало интервала доставки"
+          },
+          "to": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Окончание интервала доставки"
+          },
+          "state": {
+            "type": "string",
+            "description": "Статус интервала(закончился, отключен, включен)",
+            "enum": [
+                "active",
+                "expired",
+                "disabled"
+            ]
+          }
+        }
+      },
+      "NwkError": {
+        "type": "object",
+        "description": "Описание ошибки",
+        "required": [
+            "code",
+            "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Код ошибки"
+          },
+          "message": {
+            "type": "string",
+            "description": "Сообщение об ошибке"
+          }
+        }
+      }
+    }
+  }
+}

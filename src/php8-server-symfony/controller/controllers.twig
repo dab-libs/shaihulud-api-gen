@@ -11,15 +11,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use {{ publicNamespace }}\{{ controller.actionType }};
-{%     for result in controller.results %}
-use {{ publicNamespace }}\{{ result.type }};
+{%     for type in controller.importedTypes %}
+use {{ type }};
 {%     endfor %}
 {%     for type in controller.importedOperationsTypes %}
-use {{ typeOperationNamespace }}\{{ type }};
+use {{ type }};
 {%     endfor %}
-{%     if controller.body != null %}
-use {{ typeOperationNamespace }}\{{ controller.body.typeInfo.operationsType }};
-{%     endif %}
 
 class {{ controller.controllerType }} {
   public function __construct(
