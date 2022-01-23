@@ -246,16 +246,16 @@ merge(@, {
             importedTypes: create_set([
                 get_var('parameters')[? (!typeInfo.primitive) && (!typeInfo.arrayItem)].typeInfo.type,
                 get_var('parameters')[? !typeInfo.arrayItem.primitive].typeInfo.arrayItem.type,
-                get_var('body')[? (!typeInfo.primitive) && (!typeInfo.arrayItem)].typeInfo.type,
-                get_var('body')[? !typeInfo.arrayItem.primitive].typeInfo.arrayItem.type,
+                [get_var('body')][? (!typeInfo.primitive) && (!typeInfo.arrayItem)].typeInfo.type,
+                [get_var('body')][? !typeInfo.arrayItem.primitive].typeInfo.arrayItem.type,
                 get_var('results')[? (!content.primitive) && (!content.arrayItem)].content.type,
                 get_var('results')[? !content.arrayItem.primitive].content.arrayItem.type
             ][])[*][].if(@ == 'DateTimeImmutable', @, &@, &concat(get_var('publicNamespace'), '\\', @)),
             importedOperationsTypes: create_set([
                 get_var('parameters')[].typeInfo.operationsType,
                 get_var('parameters')[].typeInfo.arrayItem.operationsType,
-                get_var('body')[].typeInfo.operationsType,
-                get_var('body')[].typeInfo.arrayItem.operationsType,
+                [get_var('body')][].typeInfo.operationsType,
+                [get_var('body')][].typeInfo.arrayItem.operationsType,
                 get_var('results')[].content.operationsType,
                 get_var('results')[].content.arrayItem.operationsType
             ][])[*][].concat(get_var('typeOperationNamespace'), '\\', @)
