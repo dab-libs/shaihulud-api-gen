@@ -156,11 +156,11 @@ merge(@, {
     srcFolder: set_var('srcFolder', concat(get_var('rootFolder'), 'src/')),
     namespace: set_var('namespace', concat(get_var('vendorNamespace'), '\\', get_var('apiName'), '\\v', get_var('majorVersion'))),
     publicFolder: concat(get_var('srcFolder'), 'Public/'),
-    publicNamespace: concat(get_var('namespace'), '\\Public'),
+    publicNamespace: set_var('publicNamespace', concat(get_var('namespace'), '\\Public')),
     controllerFolder: concat(get_var('srcFolder'), 'Controller/'),
     controllerNamespace: concat(get_var('namespace'), '\\Controller'),
     typeOperationFolder: concat(get_var('srcFolder'), 'TypeOperation/'),
-    typeOperationNamespace: concat(get_var('namespace'), '\\TypeOperation'),
+    typeOperationNamespace: set_var('typeOperationNamespace', concat(get_var('namespace'), '\\TypeOperation')),
     configFolder: concat(get_var('rootFolder'), 'resource/config/'),
     testFolder: concat(get_var('rootFolder'), 'test/'),
     testNamespace: concat(get_var('namespace'), '\\Test'),
@@ -244,11 +244,13 @@ merge(@, {
                 })
             }),
             importedTypes: create_set([
-                get_var('parameters')[?!typeInfo.primitive].typeInfo.type,
-                get_var('parameters')[?!typeInfo.arrayItem.primitive].typeInfo.arrayItem.type,
-                get_var('results')[?!content.primitive].content.type,
-                get_var('results')[?!content.arrayItem.primitive].content.arrayItem.type
-            ][])[*],
+                get_var('parameters')[? (!typeInfo.primitive) && (!typeInfo.arrayItem)].typeInfo.type,
+                get_var('parameters')[? !typeInfo.arrayItem.primitive].typeInfo.arrayItem.type,
+                get_var('body')[? (!typeInfo.primitive) && (!typeInfo.arrayItem)].typeInfo.type,
+                get_var('body')[? !typeInfo.arrayItem.primitive].typeInfo.arrayItem.type,
+                get_var('results')[? (!content.primitive) && (!content.arrayItem)].content.type,
+                get_var('results')[? !content.arrayItem.primitive].content.arrayItem.type
+            ][])[*][].if(@ == 'DateTimeImmutable', @, &@, &concat(get_var('publicNamespace'), '\\', @)),
             importedOperationsTypes: create_set([
                 get_var('parameters')[].typeInfo.operationsType,
                 get_var('parameters')[].typeInfo.arrayItem.operationsType,
@@ -256,7 +258,7 @@ merge(@, {
                 get_var('body')[].typeInfo.arrayItem.operationsType,
                 get_var('results')[].content.operationsType,
                 get_var('results')[].content.arrayItem.operationsType
-            ][])[*]
+            ][])[*][].concat(get_var('typeOperationNamespace'), '\\', @)
         }
     }|[].requests[]
 })
