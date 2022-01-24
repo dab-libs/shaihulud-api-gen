@@ -51,9 +51,10 @@ class ArrayOperations {
 
   /**
    * @param array|null $value
+   * @param callable $prepareItem
    * @return string|null
    */
-  public static function encodeJson($value) {
+  public static function encodeJson($value, $prepareItem) {
     if ($value === null) {
       return null;
     }

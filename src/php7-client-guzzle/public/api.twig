@@ -119,7 +119,7 @@ class {{ apiClass }} {
 {%          if request contains 'requestBody' %}
 {%            set schema = request.requestBody.content['application/json'].schema %}
 {%            set type = type(schema, 'body', request.operationId) %}
-    $body = {{ operationsType(schema, 'body', request.operationId) }}::encodeJson($content);
+    $body = {{ operationsType(schema, 'body', request.operationId) }}::encodeJson($content{{ arrayItemPreparer(schema) }});
 {%          endif %}
 
     $uri = UriTemplate::expand('{{ path }}', $path);
