@@ -248,6 +248,7 @@ merge(@, {
                 get_var('parameters')[? !typeInfo.arrayItem.primitive].typeInfo.arrayItem.type,
                 [get_var('body')][? (!typeInfo.primitive) && (!typeInfo.arrayItem)].typeInfo.type,
                 [get_var('body')][? !typeInfo.arrayItem.primitive].typeInfo.arrayItem.type,
+                get_var('results')[].type,
                 get_var('results')[? (!content.primitive) && (!content.arrayItem)].content.type,
                 get_var('results')[? !content.arrayItem.primitive].content.arrayItem.type
             ][])[*][].if(@ == 'DateTimeImmutable', @, &@, &concat(get_var('publicNamespace'), '\\', @)),
